@@ -45,7 +45,7 @@ export default class LunarDate extends Calendar {
 	 * Initialize the instance.
 	 */
 	init(force_change: boolean = false) {
-		if (!LunarDate.isValidDate({ day: this.day, month: this.month, year: this.year }))
+		if (!LunarDate.isValidDate({ day: this.day, month: this.month, year: this.year, hour: this.hour }))
 			throw new Error('Invalid date')
 
 		const recommendation = LunarDate.getRecommended({
@@ -53,6 +53,7 @@ export default class LunarDate extends Calendar {
 			month: this.month,
 			year: this.year,
 			leap_month: this.leap_month,
+			hour: this.hour,
 		})
 
 		if (force_change) {
@@ -205,7 +206,7 @@ export default class LunarDate extends Calendar {
 
 		// Build a list of info of each month in the year
 		for (let month = 1; month <= 12; month++) {
-			const date: ICalendarDate = { day: 1, month, year }
+			const date: ICalendarDate = { day: 1, month, year, hour: 0 }
 
 			const normal_lunar = new LunarDate({ ...date, leap_month: false })
 			normal_lunar.setExAttribute({
@@ -240,19 +241,14 @@ export default class LunarDate extends Calendar {
 	 * @param lunar_months
 	 * @returns Exactly the lunar date
 	 */
-	private static findLunarDate(jd: number, lunar_months: Array<LunarDate>): LunarDate | null {
-		if (lunar_months.length === 0 || !lunar_months[0].jd) {
-			throw new Error('Lunar months data is invalid or empty')
-		}
+	private static findLunarDate(jd: number, lunar_months: Array<LunarDate>, hour: number): LunarDate | null {
 		// TODO: find test case
-		if (lunar_months[0].jd > jd) {
+		if (lunar_months[0].jd && lunar_months[0].jd > jd) {
 			throw new Error('Out of calculation')
 		}
 
 		let index = lunar_months.length - 1
-		if (!lunar_months[index].jd) {
-			return null
-		}
+		if (lunar_months[index].jd === undefined) return null
 		while (jd < (lunar_months[index].jd as number)) {
 			index--
 		}
@@ -263,6 +259,7 @@ export default class LunarDate extends Calendar {
 			day: lunar_months[index].day + offset,
 			month: lunar_months[index].month,
 			year: lunar_months[index].year,
+			hour: hour,
 			leap_month: lunar_months[index].leap_month,
 		})
 
@@ -319,7 +316,7 @@ export default class LunarDate extends Calendar {
 	 * @returns Lunar Calendar
 	 */
 	static fromSolarDate(date: SolarDate): LunarDate | null {
-		const { day, month, year } = date.get()
+		const { day, month, year, hour } = date.get()
 
 		let year_code = LunarDate.getYearCode(year)
 		let lunar_months = LunarDate.decodeLunarYear(year, year_code)
@@ -330,7 +327,7 @@ export default class LunarDate extends Calendar {
 			year_code = LunarDate.getYearCode(year - 1)
 			lunar_months = LunarDate.decodeLunarYear(year - 1, year_code)
 		}
-		return LunarDate.findLunarDate(jd, lunar_months)
+		return LunarDate.findLunarDate(jd, lunar_months, hour)
 	}
 
 	/**
@@ -369,11 +366,47 @@ export default class LunarDate extends Calendar {
 	 * Return hour's name in Sexagenary cycle (Can Chi). Heavenly stem is set to 'Ty'.
 	 * @returns hour's name in Sexagenary cycle
 	 */
-	getHourName(): string | null {
+	getFirstHourNameOfTheDay(): string | null {
 		if (this.jd) {
 			return Constants.CAN[((this.jd - 1) * 2) % 10] + ' ' + Constants.CHI[0]
 		}
 		return null
+	}
+
+	/**
+	 * Return real hour's name in Sexagenary cycle (Can Chi). Heavenly stem is set to 'Ty'.
+	 * @returns hour's name in Sexagenary cycle
+	 */
+	getRealHourName(): string | null {
+		const hourIndex = Math.floor((this.hour + 1) / 2) % 12
+		let hourCan
+		switch (Constants.CAN[((this.jd as number) + 9) % 10]) {
+			case 'Giáp':
+			case 'Kỷ':
+				hourCan = Constants.CAN[hourIndex % 10]
+				break
+			case 'Ất':
+			case 'Canh':
+				hourCan = Constants.CAN[(hourIndex + 2) % 10]
+				break
+			case 'Bính':
+			case 'Tân':
+				hourCan = Constants.CAN[(hourIndex + 4) % 10]
+				break
+			case 'Đinh':
+			case 'Nhâm':
+				hourCan = Constants.CAN[(hourIndex + 6) % 10]
+				break
+			case 'Mậu':
+			case 'Quý':
+				hourCan = Constants.CAN[(hourIndex + 8) % 10]
+				break
+			default:
+				hourCan = 1
+				break
+		}
+
+		return hourCan + ' ' + Constants.CHI[hourIndex]
 	}
 
 	/**
@@ -442,6 +475,7 @@ export default class LunarDate extends Calendar {
 			day: this.day,
 			month: this.month,
 			year: this.year,
+			hour: this.hour,
 			leap_month: this.leap_month,
 		}
 

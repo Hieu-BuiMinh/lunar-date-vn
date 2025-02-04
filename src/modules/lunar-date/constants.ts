@@ -168,4 +168,4 @@ export const SOLAR_TERMS = [
 	'Kinh trập',
 ]
 
-// See: https://github.com/NghiaCaNgao/lunarDate/wiki/Terminology
+// See: https://github.com/Hieu-BuiMinh/lunar-date-vn/wiki/Terminology

@@ -24,6 +24,7 @@ export default class SolarDate extends Calendar {
 						day: date.getDate(),
 						month: date.getMonth() + 1,
 						year: date.getFullYear(),
+						hour: date.getHours(),
 					},
 					'solar_calendar'
 				)
@@ -125,7 +126,7 @@ export default class SolarDate extends Calendar {
 		const month = E < 14 ? E - 1 : E - 13
 		const year = month < 3 ? C - 4715 : C - 4716
 
-		return new SolarDate({ day, month, year })
+		return new SolarDate({ day, month, year, hour: 0 })
 	}
 
 	/**
@@ -145,7 +146,7 @@ export default class SolarDate extends Calendar {
 			const m = month + 12 * a - 3
 			let jd = day + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - INT(y / 100) + INT(y / 400) - 32045
 
-			// https://github.com/NghiaCaNgao/lunarDate/wiki/Julian-calendar-conversion-problem
+			// https://github.com/Hieu-BuiMinh/lunar-date-vn/wiki/Julian-calendar-conversion-problem
 			if (jd < 2299161) {
 				jd = day + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - 32083
 			}
@@ -179,6 +180,7 @@ export default class SolarDate extends Calendar {
 					day: date.getDate(),
 					month: date.getMonth() + 1,
 					year: date.getFullYear(),
+					hour: date.getHours(),
 				})
 				this.jd = SolarDate.jdn(date)
 			} else {

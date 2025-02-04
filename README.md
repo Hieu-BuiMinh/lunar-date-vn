@@ -524,6 +524,7 @@ console.log(al.get());
 #### lunar.getYearName()
 
 Get the name of the year according to the sexagenary cycle.
+
 (Lấy tên của năm theo can chi.)
 
 ```ts showLineNumbers
@@ -533,6 +534,7 @@ getYearName(): string
 #### lunar.getMonthName()
 
 Get the name of the month according to the sexagenary cycle.
+
 (Lấy tên của tháng theo can chi.)
 
 ```ts showLineNumbers
@@ -542,24 +544,37 @@ getMonthName(): string
 #### lunar.getDayName()
 
 Get the name of the day according to the sexagenary cycle.
+
 (Lấy tên của ngày theo can chi.)
 
 ```ts showLineNumbers
 getDayName(): string
 ```
 
-#### lunar.getHourName()
+#### lunar.getFirstHourNameOfTheDay()
 
-Get the name of the hour according to the sexagenary cycle.
-(Lấy tên của giờ theo can chi.)
+Get the first hour's name of the day according to the sexagenary cycle.
+
+(Lấy tên của giờ Tý đầu tiên trong ngày theo can chi.)
 
 ```ts showLineNumbers
-getHourName(): string
+getFirstHourNameOfTheDay(): string
+```
+
+#### lunar.getRealHourName()
+
+Get the current hour's name of the day according to the sexagenary cycle.
+
+(Lấy tên của giờ hiện tại trong ngày theo can chi.)
+
+```ts showLineNumbers
+getRealHourName(): string
 ```
 
 #### lunar.getDayOfWeek()
 
 Get the name of the day of the week.
+
 (Lấy tên thứ trong tuần.)
 
 ```ts showLineNumbers
@@ -568,7 +583,8 @@ getDayOfWeek(): string
 
 #### lunar.getSolarTerm()
 
-Get the name of the solar term
+Get the name of the solar term.
+
 (Lấy tên tiết khí.)
 
 ```ts showLineNumbers
@@ -586,14 +602,15 @@ lunar.init();
 console.log(lunar.getYearName()); // Quý Mão
 console.log(lunar.getMonthName()); // Mậu Ngọ
 console.log(lunar.getDayName()); // Mậu Thân
-console.log(lunar.getHourName()); // Nhâm Tý
+console.log(lunar.getFirstHourNameOfTheDay()); // Nhâm Tý
 console.log(lunar.getSolarTerm()); // Mang chủng
 console.log(lunar.getDayOfWeek()); // Thứ hai
 ```
 
 #### lunar.getLuckyHours()
 
-Get the lucky hour
+Get the lucky hour.
+
 (Lấy giờ hoàng đạo.)
 
 ```ts showLineNumbers
