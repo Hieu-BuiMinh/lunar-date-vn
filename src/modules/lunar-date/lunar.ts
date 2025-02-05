@@ -45,13 +45,22 @@ export default class LunarDate extends Calendar {
 	 * Initialize the instance.
 	 */
 	init(force_change: boolean = false) {
-		if (!LunarDate.isValidDate({ day: this.day, month: this.month, year: this.year, hour: this.hour }))
+		if (
+			!LunarDate.isValidDate({
+				day: this.day,
+				month: this.month,
+				year: this.year,
+				hour: this.hour,
+				yearIndex: this.yearIndex,
+			})
+		)
 			throw new Error('Invalid date')
 
 		const recommendation = LunarDate.getRecommended({
 			day: this.day,
 			month: this.month,
 			year: this.year,
+			yearIndex: this.yearIndex,
 			leap_month: this.leap_month,
 			hour: this.hour,
 		})
@@ -206,7 +215,7 @@ export default class LunarDate extends Calendar {
 
 		// Build a list of info of each month in the year
 		for (let month = 1; month <= 12; month++) {
-			const date: ICalendarDate = { day: 1, month, year, hour: 0 }
+			const date: ICalendarDate = { day: 1, month, year, hour: 0, yearIndex: 0 }
 
 			const normal_lunar = new LunarDate({ ...date, leap_month: false })
 			normal_lunar.setExAttribute({
@@ -241,7 +250,12 @@ export default class LunarDate extends Calendar {
 	 * @param lunar_months
 	 * @returns Exactly the lunar date
 	 */
-	private static findLunarDate(jd: number, lunar_months: Array<LunarDate>, hour: number): LunarDate | null {
+	private static findLunarDate(
+		jd: number,
+		lunar_months: Array<LunarDate>,
+		hour: number,
+		yearIndex: number
+	): LunarDate | null {
 		// TODO: find test case
 		if (lunar_months[0].jd && lunar_months[0].jd > jd) {
 			throw new Error('Out of calculation')
@@ -259,6 +273,7 @@ export default class LunarDate extends Calendar {
 			day: lunar_months[index].day + offset,
 			month: lunar_months[index].month,
 			year: lunar_months[index].year,
+			yearIndex: yearIndex,
 			hour: hour,
 			leap_month: lunar_months[index].leap_month,
 		})
@@ -316,7 +331,7 @@ export default class LunarDate extends Calendar {
 	 * @returns Lunar Calendar
 	 */
 	static fromSolarDate(date: SolarDate): LunarDate | null {
-		const { day, month, year, hour } = date.get()
+		const { day, month, year, hour, yearIndex } = date.get()
 
 		let year_code = LunarDate.getYearCode(year)
 		let lunar_months = LunarDate.decodeLunarYear(year, year_code)
@@ -327,7 +342,7 @@ export default class LunarDate extends Calendar {
 			year_code = LunarDate.getYearCode(year - 1)
 			lunar_months = LunarDate.decodeLunarYear(year - 1, year_code)
 		}
-		return LunarDate.findLunarDate(jd, lunar_months, hour)
+		return LunarDate.findLunarDate(jd, lunar_months, hour, yearIndex)
 	}
 
 	/**
@@ -408,6 +423,14 @@ export default class LunarDate extends Calendar {
 
 		return hourCan + ' ' + Constants.CHI[hourIndex]
 	}
+	/**
+	 * Return year index in 12 Zodiac signs (12 Địa Chi).
+	 */
+	getYearIndex(): number | null {
+		const index = (this.year - 4) % 12
+
+		return index
+	}
 
 	/**
 	 * Return the day's name in week.
@@ -475,6 +498,7 @@ export default class LunarDate extends Calendar {
 			day: this.day,
 			month: this.month,
 			year: this.year,
+			yearIndex: this.yearIndex,
 			hour: this.hour,
 			leap_month: this.leap_month,
 		}

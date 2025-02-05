@@ -24,6 +24,7 @@ export default class SolarDate extends Calendar {
 						day: date.getDate(),
 						month: date.getMonth() + 1,
 						year: date.getFullYear(),
+						yearIndex: date.getFullYear(),
 						hour: date.getHours(),
 					},
 					'solar_calendar'
@@ -126,7 +127,7 @@ export default class SolarDate extends Calendar {
 		const month = E < 14 ? E - 1 : E - 13
 		const year = month < 3 ? C - 4715 : C - 4716
 
-		return new SolarDate({ day, month, year, hour: 0 })
+		return new SolarDate({ day, month, year, hour: 0, yearIndex: 0 })
 	}
 
 	/**
@@ -180,6 +181,7 @@ export default class SolarDate extends Calendar {
 					day: date.getDate(),
 					month: date.getMonth() + 1,
 					year: date.getFullYear(),
+					yearIndex: date.getFullYear(),
 					hour: date.getHours(),
 				})
 				this.jd = SolarDate.jdn(date)
